@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-04-16 14:07:07
  * @LastEditors: kolf kolf@live.cn
- * @LastEditTime: 2023-04-19 08:22:54
+ * @LastEditTime: 2023-04-22 14:40:17
  * @FilePath: /any-proxy/src/store/proxy.ts
  * @Description:
  */
@@ -15,7 +15,7 @@ const defaultState = {
   webInterface: {
     enable: true
   },
-  throttle: 10000,
+  // throttle: 10000,
   forceProxyHttps: true,
   wsIntercept: true, // websocket代理
   silent: false,

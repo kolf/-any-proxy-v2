@@ -8,7 +8,7 @@
  * @FilePath: /any-proxy/src/main/proxy.ts
  * @Description:
  */
-import { getProxyServer, globalProxy } from '../lib/proxy'
+import { getProxyServer, globalProxy, certMgr } from '../lib/proxy'
 import { proxyStore } from '../store/proxy'
 
 let mainWindow: any = null
@@ -29,6 +29,7 @@ export const proxyStart = (mw) => {
 
   mainWindow = mw
 
+  // certMgr()
   // 监听req
   proxyRecorder.on('update', (reqData) => {
     console.log('reqData', reqData)
@@ -52,7 +53,7 @@ export const proxyStart = (mw) => {
 
   if (proxyStore.state.recording) {
     globalProxy.enable(proxyStore.state.port)
-    // globalProxy.enableHttps(proxyStore.state.port)
+    globalProxy.enableHttps(proxyStore.state.port)
   }
 }
 
@@ -62,7 +63,7 @@ export const proxyStop = () => {
   proxyServer.close()
 
   globalProxy.disable()
-  // globalProxy.disableHttps()
+  globalProxy.disableHttps()
   proxyServer = proxyRecorder = null
 }
 

@@ -2,7 +2,7 @@
  * @Author: Kolf
  * @Date: 2023-04-16 19:20:19
  * @LastEditors: kolf kolf@live.cn
- * @LastEditTime: 2023-04-19 08:48:29
+ * @LastEditTime: 2023-04-22 14:20:35
  * @FilePath: /any-proxy/src/renderer/src/utils/index.ts
  * @Description:
  */
@@ -13,9 +13,9 @@ export const createId = (): string => 'id-' + Date.now() + (Math.random() + '').
  * @param date Date or timestamp
  * @param formatter yyyyMMddHHmmss
  */
-export const formatDate = (date: Date, formatter: string) => {
+export const formatDate = (date: any, formatter: string) => {
   if (typeof date !== 'object') {
-    date = new Date(date)
+    date = new Date(Number(date))
   }
 
   const transform = (value: number) => {
@@ -44,7 +44,6 @@ export const formatDate = (date: Date, formatter: string) => {
 
 export const selectText = (element) => {
   let range, selection
-
   if (window.getSelection) {
     selection = window.getSelection()
     range = document.createRange()

@@ -2,7 +2,7 @@
  * @Author: error: error: git config user.name & please set dead value or install git && error: git config user.email & please set dead value or install git & please set dead value or install git
  * @Date: 2023-04-15 14:21:28
  * @LastEditors: kolf kolf@live.cn
- * @LastEditTime: 2023-04-19 09:04:00
+ * @LastEditTime: 2023-04-22 15:20:32
  * @FilePath: /any-proxy/src/renderer/src/components/AppLayout.tsx
  * @Description:
  */
@@ -13,8 +13,8 @@ import {
   PlayCircleOutlined,
   HighlightOutlined
 } from '@ant-design/icons'
-import { Layout, Table, Button, Space } from 'antd'
-import { List } from './List'
+import { Layout, Button, Space, Input } from 'antd'
+import { Table } from './table'
 import { createId, formatDate } from '../utils'
 import { Details } from './Details'
 
@@ -29,17 +29,17 @@ const columns = [
   {
     title: 'Method',
     dataIndex: 'method',
-    width: 100
+    width: 80
   },
   {
     title: 'Code',
     dataIndex: 'statusCode',
-    width: 70
+    width: 60
   },
   {
     title: 'Host',
     dataIndex: 'host',
-    width: 200
+    width: 120
   },
   {
     title: 'Path',
@@ -48,71 +48,64 @@ const columns = [
   },
   {
     title: 'MIME',
-    width: 150,
+    width: 120,
     dataIndex: 'mime'
   },
   {
     title: 'Time',
-    width: 100,
+    width: 72,
     dataIndex: 'startTime',
-    render: (text) => {
-      const timeStr = formatDate(text, 'hh:mm:ss')
-      return <span>{timeStr}</span>
+    render: (records) => {
+      console.log(records, 'text')
+      const timeStr = formatDate(records.startTime, 'hh:mm:ss')
+      return timeStr
     }
   }
 ]
 
-const makeData = (dataSource) => {
-  // console.log(dataSource, 'dataSource')
+const makeData = (data) => {
+  console.log(data, 'dataSource')
   // console.log(dataSource.values(), 'dataSource.values()')
-  return dataSource
-    .filter((item) => item.host)
+  return data
+    .filter((item) => item.host && item.path)
     .map((item, index) => {
-      const { host, path, method, statusCode } = item
       return {
-        index: index + 1,
-        host,
-        path,
-        method,
-        statusCode
+        ...item,
+        index: index + 1
       }
     })
 }
 
 export const AppLayout: React.FC = () => {
   // const [dataMap, update] = React.useState(new Map())
-  const [data, setData] = React.useState([])
-
-  const update = (e, reqData) => {
-    const req = JSON.parse(reqData)
-    const id = createId()
-    data.push({ ...req, _key: id })
-    setData(data)
-    // const key = 'reqId-' + id
-    // const oldData = dataMap.get(key)
-    // console.log(oldData, 'oldData')
-    // if (oldData) {
-    //   dataMap.set(key, [...oldData, data])
-    // } else {
-    //   dataMap.set(key, [data])
-    // }
-
-    // update(dataMap)
-  }
+  const [data, setData] = React.useState<any[]>([])
 
   React.useEffect(() => {
+    if (!window.electron) {
+      return
+    }
     const { ipcRenderer } = window.electron
-    console.log(window, 'window')
     ipcRenderer?.on('to-get-req', update)
     ipcRenderer?.send('ready-to-init-proxy')
+
+    function update(_, reqData): void {
+      const req = JSON.parse(reqData)
+      const _key = createId()
+      console.log(data, 'data')
+      setData((data) => [...data, { ...req, _key }])
+    }
   }, [window])
 
   return (
-    <Layout style={{ height: '100vh' }}>
+    <Layout style={{ height: '100vh', minWidth: 600 }}>
       <Content className="app-body">
         <Header
           className="app-header"
-          style={{ background: '#fff', paddingTop: 12, paddingLeft: 76, lineHeight: 1.6 }}
+          style={{
+            background: '#fff',
+            padding: '12px 20px 0 76px',
+            lineHeight: 1.6
+          }}
         >
           <Space>
             <div style={{ textAlign: 'center' }}>
@@ -127,29 +120,20 @@ export const AppLayout: React.FC = () => {
               </Button>
               <p>清除</p>
             </div>
-            <div style={{ textAlign: 'center' }}>
-              <Button size="small" style={{ width: 50 }}>
-                <BranchesOutlined style={{ fontSize: 14 }} />
-              </Button>
-              <p>规则</p>
-            </div>
-            <div style={{ textAlign: 'center' }}>
-              <Button size="small" style={{ width: 50 }}>
-                <IdcardOutlined style={{ fontSize: 14 }} />
-              </Button>
-              <p>证书</p>
-            </div>
+            {/*<div style={{ textAlign: 'center' }}>*/}
+            {/*  <Button size="small" style={{ width: 50 }}>*/}
+            {/*    <IdcardOutlined style={{ fontSize: 14 }} />*/}
+            {/*  </Button>*/}
+            {/*  <p>证书</p>*/}
+            {/*</div>*/}
           </Space>
+          <div style={{ float: 'right', paddingRight: 0, paddingTop: 5, width: 300 }}>
+            <Input placeholder="搜索" style={{ background: '#eee', border: 'none' }} />
+          </div>
         </Header>
 
         <div className="app-list">
-          <Table
-            size="small"
-            rowKey="id"
-            pagination={false}
-            dataSource={makeData(data)}
-            columns={columns}
-          />
+          <Table rowKey="_key" dataSource={makeData(data)} columns={columns} />
         </div>
       </Content>
       <Sider width={'40%'} theme="light" style={{ borderLeft: '1px solid #f5f5f5' }}>

@@ -9,16 +9,15 @@
 import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import icon from '../../resources/icon.png?asset'
+import icon from '../../resources/icon.png'
 import { proxyStart } from './proxy'
-
-// const Menu = electron.Menu
 
 function createWindow(): void {
   // Create the browser window.
   // Menu.setApplicationMenu(null)
   const mainWindow = new BrowserWindow({
     width: 1200,
+    minWidth: 900,
     height: 900,
     show: false,
     autoHideMenuBar: true,
