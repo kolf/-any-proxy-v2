@@ -65,3 +65,18 @@ export const getQueryParameter = (name) => {
     return results[1] || ''
   }
 }
+
+export function parseCookies(cookieString: string): Record<string, string> | null {
+  if (!cookieString) {
+    return null
+  }
+  const cookies: Record<string, string> = {}
+  // 使用正则表达式匹配 cookie 字符串中的每个 cookie
+  const cookiePairs = cookieString.split(';')
+  for (const pair of cookiePairs) {
+    const [name, value] = pair.trim().split('=')
+    cookies[name] = value
+  }
+
+  return cookies
+}

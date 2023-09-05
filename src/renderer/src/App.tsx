@@ -7,7 +7,7 @@
  * @Description:
  */
 import { ConfigProvider, theme } from 'antd'
-import { AppLayout } from './components/AppLayout'
+import { AppLayout } from './components/app-layout'
 
 function App(): JSX.Element {
   const {

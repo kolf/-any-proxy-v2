@@ -11,61 +11,37 @@ import * as React from 'react'
 import styles from './index.module.less'
 import { Empty } from 'antd'
 import useVirtualList from 'ahooks/es/useVirtualList'
-
-interface Column {
-  title: React.ReactElement
+import { Tr } from './Tr'
+export interface ColumnProps {
+  title: React.ReactNode
   dataIndex: string
   width?: number
-  render?: (text: string) => React.ReactElement
+  render?: (item: any) => React.ReactNode
 }
 
 interface Props {
-  columns: Column[]
+  columns: ColumnProps[]
   dataSource: any[]
   rowKey: string
-  onRowClick
-}
-
-interface TrProps {
-  cols: Column[]
-  onClick?: (e: any) => void
-}
-
-const Tr: React.FC<TrProps> = ({ cols, onClick }) => {
-  return (
-    <div className={styles['tr']}>
-      {cols.map((col) => (
-        <div
-          className={styles['td']}
-          style={col.width ? { width: col.width } : { flex: 1 }}
-          key={col.dataIndex}
-          title={col.title + ''}
-          onClick={onClick}
-        >
-          {col.title}
-        </div>
-      ))}
-    </div>
-  )
+  onSelectRowKey: (index: number) => void
 }
 
 export const Table: React.FC<Props> = (props) => {
-  const { columns, dataSource, rowKey = 'id' } = props
+  const { columns, dataSource = [], rowKey = 'id', onSelectRowKey } = props
+  const [selectedKey, setSelectedKey] = React.useState<number>(-1)
   const containerRef = React.useRef(null)
   const wrapperRef = React.useRef(null)
   const [list] = useVirtualList(dataSource, {
     containerTarget: containerRef,
     wrapperTarget: wrapperRef,
-    itemHeight: 27,
+    itemHeight: 26,
     overscan: 10
   })
 
   const handleClick = (index: number) => {
-    const item = dataSource[index]
-    console.log(item, 'item')
+    setSelectedKey(index)
+    onSelectRowKey && onSelectRowKey(index)
   }
-
-  console.log(dataSource.length, list, 'list')
 
   return (
     <div className={styles['table']}>
@@ -74,22 +50,27 @@ export const Table: React.FC<Props> = (props) => {
       </div>
       <div className={styles['tbody']} ref={containerRef}>
         <div className="list" ref={wrapperRef}>
-          {list.map((item, index) => (
-            <Tr
-              key={item[rowKey]}
-              onClick={() => {
-                handleClick(index)
-              }}
-              cols={columns.map((column) => {
-                const title = column.render ? column.render(item.data) : item.data[column.dataIndex]
-                return {
-                  ...column,
-                  index: item.index + 1,
-                  title
-                }
-              })}
-            />
-          ))}
+          {list.map((item) => {
+            const { data, index } = item
+            return (
+              <Tr
+                index={index}
+                key={data[rowKey]}
+                selected={selectedKey === index}
+                onClick={() => {
+                  handleClick(index)
+                }}
+                cols={columns.map((column) => {
+                  const title = column.render ? column.render(data) : data[column.dataIndex]
+                  return {
+                    ...column,
+                    index: index + 1,
+                    title
+                  }
+                })}
+              />
+            )
+          })}
         </div>
       </div>
       {dataSource.length === 0 && (
