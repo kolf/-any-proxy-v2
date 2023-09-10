@@ -12,36 +12,31 @@ import styles from './index.module.less'
 import { Empty } from 'antd'
 import useVirtualList from 'ahooks/es/useVirtualList'
 import { Tr } from './Tr'
-export interface ColumnProps {
-  title: React.ReactNode
+interface Column {
+  title: React.ReactElement
   dataIndex: string
   width?: number
-  render?: (item: any) => React.ReactNode
+  render?: (text: string) => React.ReactElement
 }
 
 interface Props {
-  columns: ColumnProps[]
+  columns: Column[]
   dataSource: any[]
   rowKey: string
-  onSelectRowKey: (index: number) => void
+  onRowClick: (record: any) => void
 }
 
 export const Table: React.FC<Props> = (props) => {
-  const { columns, dataSource = [], rowKey = 'id', onSelectRowKey } = props
-  const [selectedKey, setSelectedKey] = React.useState<number>(-1)
+  const { columns, dataSource, rowKey = 'id', onRowClick } = props
   const containerRef = React.useRef(null)
   const wrapperRef = React.useRef(null)
+  const [selectedIndex, setSelectedIndex] = React.useState<React.Key>(-1)
   const [list] = useVirtualList(dataSource, {
     containerTarget: containerRef,
     wrapperTarget: wrapperRef,
     itemHeight: 26,
     overscan: 10
   })
-
-  const handleClick = (index: number) => {
-    setSelectedKey(index)
-    onSelectRowKey && onSelectRowKey(index)
-  }
 
   return (
     <div className={styles['table']}>
@@ -50,27 +45,30 @@ export const Table: React.FC<Props> = (props) => {
       </div>
       <div className={styles['tbody']} ref={containerRef}>
         <div className="list" ref={wrapperRef}>
-          {list.map((item) => {
-            const { data, index } = item
-            return (
-              <Tr
-                index={index}
-                key={data[rowKey]}
-                selected={selectedKey === index}
-                onClick={() => {
-                  handleClick(index)
-                }}
-                cols={columns.map((column) => {
-                  const title = column.render ? column.render(data) : data[column.dataIndex]
-                  return {
-                    ...column,
-                    index: index + 1,
-                    title
-                  }
-                })}
-              />
-            )
-          })}
+          {list.map((item, index) => (
+            <Tr
+              // key={item.data[rowKey]}
+              index={index}
+              selected={selectedIndex === item.index}
+              onClick={() => {
+                setSelectedIndex(item.index)
+                onRowClick(item.data)
+              }}
+              cols={columns.map((column) => {
+                let title = item.data[column.dataIndex]
+                if (column.dataIndex === 'index') {
+                  title = item.index + 1
+                } else if (column.render) {
+                  title = column.render(item.data)
+                }
+                // const title = column.render ? column.render(item.data) : item.data[column.dataIndex]
+                return {
+                  ...column,
+                  title
+                }
+              })}
+            />
+          ))}
         </div>
       </div>
       {dataSource.length === 0 && (

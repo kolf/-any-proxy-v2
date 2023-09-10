@@ -22,7 +22,7 @@ function createWindow(): void {
     show: false,
     autoHideMenuBar: true,
     titleBarStyle: 'hidden',
-    trafficLightPosition: { x: 10, y: 16 },
+    trafficLightPosition: { x: 10, y: 20 },
     // frame: false,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {

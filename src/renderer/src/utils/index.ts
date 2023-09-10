@@ -66,7 +66,7 @@ export const getQueryParameter = (name) => {
   }
 }
 
-export function parseCookies(cookieString: string): Record<string, string> | null {
+export const parseCookies = (cookieString: string): Record<string, string> | null => {
   if (!cookieString) {
     return null
   }
@@ -79,4 +79,13 @@ export function parseCookies(cookieString: string): Record<string, string> | nul
   }
 
   return cookies
+}
+
+export const parseString = (str: string) => {
+  try {
+    return JSON.parse(str)
+  } catch (err) {
+    console.log(err)
+  }
+  return JSON.stringify(str)
 }

@@ -3,7 +3,7 @@ import { ColumnProps } from './index'
 import * as React from 'react'
 import cn from 'classnames'
 interface TrProps extends React.HTMLAttributes<HTMLDivElement> {
-  index: number
+  index?: number
   cols: ColumnProps[]
   onClick?: (e) => void
   selected?: boolean
@@ -13,7 +13,7 @@ const Row: React.FC<TrProps> = ({ index, className, selected, cols, onClick }) =
     <div
       className={cn(styles['tr'], className, {
         [styles['tr-clickable']]: selected,
-        [styles['tr-even']]: index % 2
+        [styles['tr-even']]: index !== undefined && index % 2
       })}
     >
       {cols.map((col) => (

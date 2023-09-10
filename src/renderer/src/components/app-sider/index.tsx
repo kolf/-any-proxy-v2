@@ -6,36 +6,12 @@
  * @FilePath: /any-proxy/src/renderer/src/components/Details.tsx
  * @Description:
  */
-import { Empty, Layout, Segmented } from 'antd'
+import { Layout, Segmented } from 'antd'
 const { Content } = Layout
 import * as React from 'react'
 import styles from './index.module.less'
 import { parseCookies } from '../../utils'
-const Group = ({ title, children }) => {
-  console.log(children, 'children')
-  return (
-    <div className="details-group">
-      <div className="details-title">{title}</div>
-      {children ? (
-        <div style={{ padding: '12px' }}>{children}</div>
-      ) : (
-        <div style={{ padding: '24px 48px', textAlign: 'center' }}>No data</div>
-      )}
-    </div>
-  )
-}
-
-const Item = ({ label, children }) => {
-  if (!label) {
-    return null
-  }
-  return (
-    <div className="details-item">
-      <label className="details-item__label">{label}: </label>
-      <div className={'details-item__value'}>{children}</div>
-    </div>
-  )
-}
+import * as Panel from '../panel'
 
 interface Props {
   dataSource: any
@@ -47,78 +23,72 @@ const tabs: TabType[] = ['Request', 'Response']
 
 const RequestList = (props) => {
   const { dataSource = {} } = props
+  const cookies = dataSource.reqHeader ? parseCookies(dataSource.reqHeader?.Cookie) : null
+  const body = dataSource.reqBody
+  const headers = typeof dataSource.reqHeader === 'object' ? dataSource.reqHeader : null
 
-  const cookies = parseCookies(dataSource.reqHeader?.Cookie)
-  const bodys = dataSource.reqBody ? JSON.parse(dataSource.reqBody) : null
   return (
     <>
-      <Group title="General">
+      <Panel.Group title="General">
         {dataSource.method && (
           <>
-            <Item label="Method">{dataSource.method}</Item>
-            <Item label="URL">{dataSource.url}</Item>
-            <Item label="Protocol">{dataSource.protocol}</Item>
-            <Item label="Method">{dataSource.method}</Item>
+            <Panel.Item label="Method">{dataSource.method}</Panel.Item>
+            <Panel.Item label="URL">{dataSource.url}</Panel.Item>
+            <Panel.Item label="Protocol">{dataSource.protocol}</Panel.Item>
+            <Panel.Item label="Method">{dataSource.method}</Panel.Item>
           </>
         )}
-      </Group>
-      <Group title="Header">
-        {dataSource.reqHeader &&
-          Object.entries(dataSource.reqHeader)
+      </Panel.Group>
+      <Panel.Group title="Header">
+        {headers &&
+          Object.entries(headers)
             .filter(([key, value]) => key !== 'Cookie' && value)
             .map(([key, value]) => {
               return (
-                <Item label={key} key={key}>
+                <Panel.Item label={key} key={key}>
                   {value}
-                </Item>
+                </Panel.Item>
               )
             })}
-      </Group>
+      </Panel.Group>
 
-      <Group title="Cookies">
+      <Panel.Group title="Cookies">
         {cookies &&
           Object.entries(cookies).map(([key, value]) => {
             return (
-              <Item label={key} key={key}>
+              <Panel.Item label={key} key={key}>
                 {value}
-              </Item>
+              </Panel.Item>
             )
           })}
-      </Group>
-
-      <Group title="Body">
-        {bodys &&
-          Object.entries(bodys).map(([key, value]) => {
-            return (
-              <Item label={key} key={key}>
-                {value}
-              </Item>
-            )
-          })}
-      </Group>
+      </Panel.Group>
+      <Panel.Group title="Body">{body}</Panel.Group>
     </>
   )
 }
 
 const ResponseList = (props) => {
   const { dataSource = {} } = props
-  console.log(dataSource.resHeader, 'resHeader')
+  const headers = dataSource.resHeader
+
   return (
     <>
-      <Group title="General">
-        {dataSource.method && <Item label="Status Code">{dataSource.statusCode}</Item>}
-      </Group>
-      <Group title="Header">
-        {dataSource.resHeader &&
-          Object.entries(dataSource.resHeader).map(([key, value]) => {
+      <Panel.Group title="General">
+        {dataSource.statusCode && (
+          <Panel.Item label="Status Code">{dataSource.statusCode}</Panel.Item>
+        )}
+      </Panel.Group>
+      <Panel.Group title="Header">
+        {typeof headers === 'object' &&
+          Object.entries(headers).map(([key, value]) => {
             return (
-              <Item label={key} key={key}>
+              <Panel.Item label={key} key={key}>
                 {value}
-              </Item>
+              </Panel.Item>
             )
           })}
-      </Group>
-      <Group title="Body">{dataSource.resBody}</Group>
+      </Panel.Group>
+      <Panel.Group title="Body">{dataSource.resBody}</Panel.Group>
     </>
   )
 }
@@ -130,12 +100,18 @@ export const AppSider: React.FC<Props> = (props) => {
   return (
     <Layout style={{ height: '100%', background: '#fff' }}>
       <div className={styles.header}>
-        <Segmented options={tabs} value={tabKey} onChange={setTabKey} />
+        <Segmented
+          options={tabs}
+          value={tabKey}
+          onChange={(v) => {
+            setTabKey(v as TabType)
+          }}
+        />
       </div>
       <Content style={{ height: '100%', marginTop: -1 }}>
         <div style={{ height: '100%', overflow: 'auto' }}>
-          {tabKey === 'Request' && <RequestList dataSource={dataSource} />}
-          {tabKey === 'Response' && <ResponseList dataSource={dataSource} />}
+          {tabKey === 'Request' && <RequestList dataSource={dataSource || {}} />}
+          {tabKey === 'Response' && <ResponseList dataSource={dataSource || {}} />}
         </div>
       </Content>
     </Layout>

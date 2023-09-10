@@ -8,18 +8,18 @@
  */
 import * as React from 'react'
 import { CloseOutlined, PlayCircleOutlined } from '@ant-design/icons'
-import { Layout, Button, Space, Input } from 'antd'
+import { Layout, Button, Space } from 'antd'
 import { Table, ColumnProps } from '../table'
 import { createId, formatDate } from '../../utils'
 import { AppSider } from '../app-sider'
 
-const { Header, Content, Sider } = Layout
+const { Content, Sider } = Layout
 
 const columns: ColumnProps[] = [
   {
     title: '#',
     dataIndex: 'index',
-    width: 60
+    width: 68
     // render: (records) => {
     //   return <div style={{ textAlign: 'center' }}>{records.index}</div>
     // }
@@ -27,17 +27,17 @@ const columns: ColumnProps[] = [
   {
     title: 'Method',
     dataIndex: 'method',
-    width: 80
+    width: 60
   },
   {
     title: 'Code',
     dataIndex: 'statusCode',
-    width: 60
+    width: 54
   },
   {
     title: 'Host',
     dataIndex: 'host',
-    width: 120
+    width: 160
   },
   {
     title: 'Path',
@@ -67,18 +67,12 @@ const makeData = (data, inputValue) => {
     .filter((item) =>
       inputValue ? item.host.includes(inputValue) || item.path.includes(inputValue) : true
     )
-    .map((item, index) => {
-      return {
-        ...item,
-        index: index + 1
-      }
-    })
 }
 
 export const AppLayout: React.FC = () => {
   // const [dataMap, update] = React.useState(new Map())
   const [data, setData] = React.useState<any[]>([])
-  const [selectedRowKey, setSelectedRowKey] = React.useState<number>(-1)
+  const [selectedItem, setSelectedItem] = React.useState<any>(null)
   const [inputValue, setInputValue] = React.useState<string>('')
 
   React.useEffect(() => {
@@ -95,9 +89,6 @@ export const AppLayout: React.FC = () => {
       setData((data) => [...data, { ...req, _key }])
     }
   }, [window])
-
-  console.log(selectedRowKey, 'selectedRowKey')
-  const currentData = makeData(data, inputValue)
 
   return (
     <Layout style={{ height: '100vh' }}>
@@ -129,15 +120,15 @@ export const AppLayout: React.FC = () => {
           <Content style={{ height: '100%' }}>
             <Table
               rowKey="_key"
-              dataSource={currentData}
+              dataSource={makeData(data, inputValue)}
               columns={columns}
-              onSelectRowKey={setSelectedRowKey}
+              onRowClick={setSelectedItem}
             />
           </Content>
         </Layout>
       </Content>
       <Sider width={400} style={{ borderLeft: '1px solid #e0e0e0' }}>
-        <AppSider dataSource={currentData[selectedRowKey]} />
+        <AppSider dataSource={selectedItem} />
       </Sider>
     </Layout>
   )
