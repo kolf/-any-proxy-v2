@@ -1,25 +1,16 @@
-/*
- * @Author: kolf kolf@live.cn
- * @Date: 2023-04-22 12:44:01
- * @LastEditors: kolf kolf@live.cn
- * @LastEditTime: 2023-04-22 15:01:34
- * @FilePath: /any-proxy/src/renderer/src/components/Table/index.tsx
- * @Description: 表格组件
- */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as React from 'react'
 import styles from './index.module.less'
 import { Empty } from 'antd'
 import useVirtualList from 'ahooks/es/useVirtualList'
 import { Tr } from './Tr'
 interface Column {
-  title: React.ReactElement
+  title: React.ReactNode
   dataIndex: string
   width?: number
-  render?: (text: string) => React.ReactElement
+  render?: (text: string) => React.ReactNode
 }
 
-interface Props {
+export interface Props {
   columns: Column[]
   dataSource: any[]
   rowKey: string
@@ -47,7 +38,7 @@ export const Table: React.FC<Props> = (props) => {
         <div className="list" ref={wrapperRef}>
           {list.map((item, index) => (
             <Tr
-              // key={item.data[rowKey]}
+              key={item.data[rowKey]}
               index={index}
               selected={selectedIndex === item.index}
               onClick={() => {

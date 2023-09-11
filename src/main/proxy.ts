@@ -8,7 +8,7 @@
  * @FilePath: /any-proxy/src/main/proxy.ts
  * @Description:
  */
-import { getProxyServer, globalProxy, certMgr } from '../lib/proxy'
+import { getProxyServer, globalProxy } from '../lib/proxy'
 import { proxyStore } from '../store/proxy'
 
 let mainWindow: any = null

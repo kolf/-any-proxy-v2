@@ -7,22 +7,18 @@
  * @Description:
  */
 import * as React from 'react'
-import { CloseOutlined, PlayCircleOutlined } from '@ant-design/icons'
-import { Layout, Button, Space } from 'antd'
-import { Table, ColumnProps } from '../table'
+import Icon from '@ant-design/icons'
+import { Layout, Input, Space } from 'antd'
+import { Table, Props as TableProps } from '../table'
 import { createId, formatDate } from '../../utils'
 import { AppSider } from '../app-sider'
-
 const { Content, Sider } = Layout
-
-const columns: ColumnProps[] = [
+import { Play, Remove, Setting, Pause } from '../icon'
+const columns: TableProps['columns'] = [
   {
     title: '#',
     dataIndex: 'index',
     width: 68
-    // render: (records) => {
-    //   return <div style={{ textAlign: 'center' }}>{records.index}</div>
-    // }
   },
   {
     title: 'Method',
@@ -95,27 +91,35 @@ export const AppLayout: React.FC = () => {
       <Content>
         <Layout style={{ height: '100%' }}>
           <div className="app-header">
-            <Space size={12} style={{ flex: 1, paddingTop: 4 }}>
+            <Space size={24} style={{ flex: 1, paddingTop: 4 }}>
               <div style={{ textAlign: 'center' }}>
-                <Button size="small" style={{ width: 42 }}>
-                  <PlayCircleOutlined style={{ fontSize: 14 }} />
-                </Button>
+                <Icon component={Play} />
+
                 <p>开始</p>
               </div>
               <div style={{ textAlign: 'center' }}>
-                <Button size="small" style={{ width: 42 }} onClick={() => setData([])}>
-                  <CloseOutlined style={{ fontSize: 14 }} />
-                </Button>
+                <Icon component={Pause} />
+
+                <p>暂停</p>
+              </div>
+              <div style={{ textAlign: 'center' }}>
+                <Icon component={Remove} />
+
                 <p>清除</p>
               </div>
+              <div style={{ textAlign: 'center' }}>
+                <Icon component={Setting} />
+
+                <p>设置</p>
+              </div>
             </Space>
-            {/*<Input*/}
-            {/*  style={{ width: 300, backgroundColor: '#eee' }}*/}
-            {/*  placeholder="请输入域名或者路径"*/}
-            {/*  bordered={false}*/}
-            {/*  allowClear*/}
-            {/*  onChange={(e) => setInputValue(e.target.value)}*/}
-            {/*/>*/}
+            <Input
+              style={{ width: 300, backgroundColor: '#eee' }}
+              placeholder="请输入域名或者路径"
+              bordered={false}
+              allowClear
+              onChange={(e) => setInputValue(e.target.value)}
+            />
           </div>
           <Content style={{ height: '100%' }}>
             <Table

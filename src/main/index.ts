@@ -10,7 +10,7 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png'
-import { proxyStart } from './proxy'
+import { proxyStart, proxyStop } from './proxy'
 
 function createWindow(): void {
   // Create the browser window.
@@ -24,7 +24,7 @@ function createWindow(): void {
     titleBarStyle: 'hidden',
     trafficLightPosition: { x: 10, y: 20 },
     // frame: false,
-    ...(process.platform === 'linux' ? { icon } : {}),
+    icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -80,6 +80,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit()
   }
+})
+app.on('quit', () => {
+  proxyStop()
 })
 
 // In this file you can include the rest of your app"s specific main process
